@@ -364,55 +364,7 @@
       <span class="section-badge" id="quiz-count">2 quizzes</span>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════════
-         QUIZ CARDS  ←  add new quizzes here
-         ────────────────────────────────────────────────────────────
-         Copy one <a class="quiz-card"> block and fill in:
-           href        GitHub Pages URL of the quiz
-           card-tag    Short topic label, e.g. "Python" or "Swift"
-           card-title  Display name of the quiz
-           card-desc   One sentence describing what it tests
-         ════════════════════════════════════════════════════════════ -->
-
-    <div class="quiz-grid">
-
-      <a class="quiz-card"
-         href="https://pawelswieca.github.io/Quizz_Integracja/"
-         target="_blank" rel="noopener noreferrer">
-        <span class="card-tag">Integration</span>
-        <h2 class="card-title">Quizz Integracja</h2>
-        <p class="card-desc">Test your understanding of integration topics and core methods.</p>
-        <span class="card-cta">
-          Start Quiz
-          <svg class="cta-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-               viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </span>
-      </a>
-
-      <a class="quiz-card"
-         href="https://pawelswieca.github.io/Quizz_IOS/"
-         target="_blank" rel="noopener noreferrer">
-        <span class="card-tag">iOS</span>
-        <h2 class="card-title">Quizz IOS</h2>
-        <p class="card-desc">Challenge your knowledge of iOS development and Apple's mobile ecosystem.</p>
-        <span class="card-cta">
-          Start Quiz
-          <svg class="cta-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-               viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-               aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </span>
-      </a>
-
-      <!-- ↓ paste new quiz cards above this comment ↓ -->
-
-    </div>
+   <div class="quiz-grid" id="quiz-grid"></div>
 
   </main>
 
@@ -423,12 +375,75 @@
     </p>
   </footer>
 
-  <script>
-    // Auto-counts cards and updates the badge — no need to touch this
-    const cards = document.querySelectorAll('.quiz-card');
-    const badge = document.getElementById('quiz-count');
-    if (badge) badge.textContent = `${cards.length} quiz${cards.length !== 1 ? 'zes' : ''}`;
-  </script>
+ <script>
+  const quizzes = [
+    {
+      title: "Quizz Integracja",
+      tag: "Integration",
+      href: "https://pawelswieca.github.io/Quizz_Integracja/",
+      description:
+        "Test your understanding of integration topics and core methods."
+    },
+    {
+      title: "Quizz IOS",
+      tag: "iOS",
+      href: "https://pawelswieca.github.io/Quizz_IOS/",
+      description:
+        "Challenge your knowledge of iOS development and Apple's mobile ecosystem."
+    }
+
+    // Add more quizzes here
+    // {
+    //   title: "Python Basics",
+    //   tag: "Python",
+    //   href: "https://...",
+    //   description: "Learn Python fundamentals."
+    // }
+  ];
+
+  const grid = document.getElementById("quiz-grid");
+
+  const arrowSvg = `
+    <svg class="cta-arrow"
+         xmlns="http://www.w3.org/2000/svg"
+         width="15"
+         height="15"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2.5"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  `;
+
+  quizzes.forEach(quiz => {
+    const card = document.createElement("a");
+
+    card.className = "quiz-card";
+    card.href = quiz.href;
+    card.target = "_blank";
+    card.rel = "noopener noreferrer";
+
+    card.innerHTML = `
+      <span class="card-tag">${quiz.tag}</span>
+      <h2 class="card-title">${quiz.title}</h2>
+      <p class="card-desc">${quiz.description ?? ""}</p>
+      <span class="card-cta">
+        Start Quiz
+        ${arrowSvg}
+      </span>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  const badge = document.getElementById("quiz-count");
+  badge.textContent =
+    `${quizzes.length} quiz${quizzes.length !== 1 ? "zes" : ""}`;
+</script>ł
 
 </body>
 </html>
