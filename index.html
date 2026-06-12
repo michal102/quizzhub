@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Hub 🕯️</title>
+  <meta name="description" content="A growing collection of interactive quizzes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================================================
+       QUIZ HUB — index.html
+       ----------------------------------------------------------------
+       To add a new quiz:
+         1. Find the "QUIZ CARDS" section below (~line 200)
+         2. Copy one <a class="quiz-card"> block
+         3. Update:  href       → GitHub Pages URL
+                     card-tag   → short topic label  (e.g. "Python")
+                     card-title → quiz name
+                     card-desc  → one sentence description
+       The quiz count badge updates automatically.
+       ================================================================ */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #090c17;
+      --surface:       #10142000;   /* used as base, overridden per element */
+      --card-bg:       #111526;
+      --card-hover:    #161d34;
+      --border:        #1e2540;
+      --border-hover:  #f5a623;
+      --accent:        #f5a623;
+      --accent-glow:   rgba(245, 166, 35, 0.10);
+      --accent-badge:  rgba(245, 166, 35, 0.14);
+      --accent-border: rgba(245, 166, 35, 0.25);
+      --text:          #eae8f4;
+      --text-dim:      #9499b5;
+      --text-muted:    #5a6080;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Subtle grid texture on body ──────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ───────────────────────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.375rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1875rem;
+      letter-spacing: -0.025em;
+      color: #fff;
+      line-height: 1;
+    }
+    .wordmark span { color: var(--accent); }
+
+    .header-sep {
+      width: 1px;
+      height: 14px;
+      background: var(--border);
+    }
+
+    .header-author {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Main ─────────────────────────────────────────────────────── */
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 5rem 2.5rem 6rem;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────────── */
+    .hero { margin-bottom: 4rem; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    .hero-heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      color: #fff;
+      margin-bottom: 1.25rem;
+    }
+    .hero-heading em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-body {
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+      max-width: 440px;
+    }
+
+    /* ── Quiz section ─────────────────────────────────────────────── */
+    .section-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .section-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Quiz Grid ────────────────────────────────────────────────── */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    /* ── Quiz Card ────────────────────────────────────────────────── */
+    .quiz-card {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.875rem;
+      position: relative;
+      overflow: hidden;
+      transition:
+        border-color 0.22s ease,
+        background   0.22s ease,
+        transform    0.18s ease,
+        box-shadow   0.22s ease;
+    }
+
+    /* Amber glow overlay on hover */
+    .quiz-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent-glow);
+      opacity: 0;
+      transition: opacity 0.22s ease;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    .quiz-card:hover {
+      border-color: var(--border-hover);
+      background: var(--card-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--accent-border);
+    }
+    .quiz-card:hover::after { opacity: 1; }
+
+    .quiz-card:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    /* Decorative corner accent */
+    .quiz-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle at top right, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .quiz-card:hover::before { opacity: 1; }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-badge);
+      border: 1px solid var(--accent-border);
+      border-radius: 999px;
+      padding: 0.225rem 0.65rem;
+      margin-bottom: 1.125rem;
+      width: fit-content;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.025em;
+      line-height: 1.25;
+      margin-bottom: 0.625rem;
+    }
+
+    .card-desc {
+      font-size: 0.875rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+      flex: 1;
+      margin-bottom: 1.625rem;
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+      transition: gap 0.2s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .quiz-card:hover .card-cta { gap: 0.65rem; }
+
+    .cta-arrow {
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .quiz-card:hover .cta-arrow { transform: translateX(4px); }
+
+    /* ── Footer ───────────────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .footer-text {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .footer-text a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-text a:hover { color: var(--accent); }
+
+    /* ── Responsive ───────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      header    { padding: 1.125rem 1.25rem; }
+      main      { padding: 3rem 1.25rem 4rem; }
+      footer    { padding: 1.25rem 1.25rem; }
+      .quiz-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Respect reduced-motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="wordmark">Quiz<span>Hub</span></div>
+    <div class="header-sep"></div>
+    <div class="header-author">🕯️</div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <p class="hero-eyebrow">Knowledge collection</p>
+      <h1 class="hero-heading">
+        Pick a quiz,<br>
+        <em>start learning.</em>
+      </h1>
+      <p class="hero-body">
+        A growing set of interactive quizzes. Open any one to test your knowledge — more topics coming soon.
+      </p>
+    </section>
+
+    <div class="section-bar">
+      <span class="section-label">Available quizzes</span>
+      <span class="section-badge" id="quiz-count">2 quizzes</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         QUIZ CARDS  ←  add new quizzes here
+         ────────────────────────────────────────────────────────────
+         Copy one <a class="quiz-card"> block and fill in:
+           href        GitHub Pages URL of the quiz
+           card-tag    Short topic label, e.g. "Python" or "Swift"
+           card-title  Display name of the quiz
+           card-desc   One sentence describing what it tests
+         ════════════════════════════════════════════════════════════ -->
+
+    <div class="quiz-grid">
+
+      <a class="quiz-card"
+         href="https://pawelswieca.github.io/Quizz_Integracja/"
+         target="_blank" rel="noopener noreferrer">
+        <span class="card-tag">Integration</span>
+        <h2 class="card-title">Quizz Integracja</h2>
+        <p class="card-desc">Test your understanding of integration topics and core methods.</p>
+        <span class="card-cta">
+          Start Quiz
+          <svg class="cta-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </a>
+
+      <a class="quiz-card"
+         href="https://pawelswieca.github.io/Quizz_IOS/"
+         target="_blank" rel="noopener noreferrer">
+        <span class="card-tag">iOS</span>
+        <h2 class="card-title">Quizz IOS</h2>
+        <p class="card-desc">Challenge your knowledge of iOS development and Apple's mobile ecosystem.</p>
+        <span class="card-cta">
+          Start Quiz
+          <svg class="cta-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- ↓ paste new quiz cards above this comment ↓ -->
+
+    </div>
+
+  </main>
+
+  <footer>
+    <p class="footer-text">
+      Quizzes by
+      <a href="https://github.com/pawelswieca" target="_blank" rel="noopener noreferrer">Paweł 🕯️ and more...</a>
+    </p>
+  </footer>
+
+  <script>
+    // Auto-counts cards and updates the badge — no need to touch this
+    const cards = document.querySelectorAll('.quiz-card');
+    const badge = document.getElementById('quiz-count');
+    if (badge) badge.textContent = `${cards.length} quiz${cards.length !== 1 ? 'zes' : ''}`;
+  </script>
+
+</body>
+</html>
